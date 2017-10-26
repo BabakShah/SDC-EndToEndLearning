@@ -1,12 +1,12 @@
+#importing libraries and frameworks
+
 import tensorflow as tf
 tf.python.control_flow_ops = tf
 
 from keras.models import Sequential, model_from_json, load_model
-from keras.optimizers import *
+from keras.optimizers import * #import everything from keras.optimizers
 from keras.layers import Dense, Activation, Flatten, Dropout, Lambda, Cropping2D, ELU
 from keras.layers.convolutional import Convolution2D
-#from keras.layers.pooling import MaxPooling2D
-#from keras.callbacks import EarlyStopping
 
 from scipy.misc import imread, imsave
 from sklearn.model_selection import train_test_split
@@ -34,7 +34,6 @@ def get_image(i, data):
   if random.random() > 0.5:
     image, measurement = flipped(image, measurement)
 
-  #print(i, ID)
   return image, measurement
 
 #################################################################
@@ -58,22 +57,37 @@ def generate_samples(data, batch_size):
       yield np.array(images), np.array(measurements)
 
 #################################################################
-
+# Create the Sequential (NN) model
 model = Sequential()
 
-model.add(Lambda(lambda x: (x / 127.5) - 1., input_shape = (160, 320, 3)))
+# Adding layers to the model using add() function
+# Cropping the image - output_shape = (65, 320, 3)
 model.add(Cropping2D(cropping=((70, 25), (0, 0)), input_shape = (160, 320, 3)))
+# Normalize - output_shape = (65, 320, 3)
+model.add(Lambda(lambda x: (x / 127.5) - 1.))
+# 2D convolution layer - output_shape = (17, 80, 16)
 model.add(Convolution2D(16, 8, 8, subsample = (4, 4), border_mode = "same"))
+# Activation layer (Exponential Linear Units) - output_shape = (17, 80, 16)
 model.add(ELU())
+# 2D convolution layer - output_shape = (9, 40, 32)
 model.add(Convolution2D(32, 5, 5, subsample = (2, 2), border_mode = "same"))
+# Activation layer (Exponential Linear Units) - output_shape = (9, 40, 32)
 model.add(ELU())
+# 2D convolution layer - output_shape = (5, 20, 64)
 model.add(Convolution2D(64, 5, 5, subsample = (2, 2), border_mode = "same"))
+# Flattening the input - output_shape = 6400
 model.add(Flatten())
+# Dropout the input at 0.2 rate - output_shape = 6400
 model.add(Dropout(.2))
+# Activation layer (Exponential Linear Units) - output_shape = 6400
 model.add(ELU())
+# Fully connected layer - output_shape = 512
 model.add(Dense(512))
+# Dropout the input at 0.5 rate - output_shape = 512
 model.add(Dropout(.5))
+# Activation layer (Exponential Linear Units) - output_shape = 512
 model.add(ELU())
+# Fully connected layer - output_shape = 1
 model.add(Dense(1))
 
 model.summary()
@@ -88,24 +102,21 @@ CSV_FILE = "driving_log.csv"
 
 DATA = pd.read_csv(PATH + CSV_FILE, usecols = [0, 1, 2, 3])
 
-TRAINING_DATA, VALIDATION_DATA = train_test_split(DATA, test_size = 0.15)
-TOTAL_TRAIN_DATA = len(TRAINING_DATA)
-TOTAL_VALID_DATA = len(VALIDATION_DATA)
+training_data, validation_data = train_test_split(DATA, test_size = 0.15)
+total_train = len(training_data)
+total_valid = len(validation_data)
 
 #################################################################
 print('Training model...')
 
-training_generator = generate_samples(TRAINING_DATA, batch_size = BATCH_SIZE)
-validation_generator = generate_samples(VALIDATION_DATA, batch_size = BATCH_SIZE)
-
-#early_stopping = EarlyStopping(monitor='val_loss', patience = 10, verbose = 1, mode = 'auto')
+training_generator = generate_samples(training_data, batch_size = BATCH_SIZE)
+validation_generator = generate_samples(validation_data, batch_size = BATCH_SIZE)
 
 history_object = model.fit_generator(training_generator,
-                 samples_per_epoch = TOTAL_TRAIN_DATA,
+                 samples_per_epoch = total_train,
                  validation_data = validation_generator,
-                 nb_val_samples = TOTAL_VALID_DATA,
+                 nb_val_samples = total_valid,
                  nb_epoch = NUMBER_OF_EPOCHS,
-                 #callbacks = [early_stopping],
                  verbose = 1)
 
 #################################################################
