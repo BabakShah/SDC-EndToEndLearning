@@ -1,7 +1,7 @@
 # Self-Driving Car Project: End-to-End Learning
-<div style="text-align:center">
-<img src="readme_images/EEL2.jpeg" width="90%" alt="NVIDIA end-to-end learning" />
-</div>
+
+<img src="readme_images/EEL2.jpeg" width="80%" alt="NVIDIA end-to-end learning" />
+
 
 Hello there! I'm Babak. Let me introduce you to my project. In this project I trained a convolutional neural network (CNN) to map raw pixels from a three
 front-facing cameras (left, center, right) directly to steering commands. This end-to-end approach
@@ -29,9 +29,7 @@ The steps of this project are the following:
 
 Main stages of end-to-end learning can be seen below: 
 
-<div style="text-align:center">
-<img src="readme_images/EEL1.png" width="90%" alt="Stages of end-to-end learning">
-</div>
+<img src="readme_images/EEL1.png" width="80%" alt="Stages of end-to-end learning">
 
 ### Detailed Design Approach
 
@@ -115,6 +113,7 @@ I used the training data for training the model. The validation set helped deter
 
 At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road. You can see the video of the car driving around the track in a simulator:
 
-<iframe width="100%" height="400" src="run2.mp4" type="video/mp4" frameborder="0" allowfullscreen>
+<video width="80%" controls> 
+<source src="run2.mp4" type="video/mp4">
   Your browser does not support HTML5 video.
 </iframe>
